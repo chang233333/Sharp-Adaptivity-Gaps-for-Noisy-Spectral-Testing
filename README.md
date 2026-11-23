@@ -2,7 +2,7 @@
 
 SMC · Beihang University · November 23, 2026
 
-[Read the preprint (PDF)](spectral-testing.pdf)
+[Read the preprint (PDF)](spectral-testing-github-20261123/spectral-testing.pdf)
 
 Can feedback help detect a single direction of positive curvature in an unknown symmetric matrix? Each measurement returns one noisy scalar, and the largest eigenvalue is separated from zero by a margin $\gamma$. At fixed error, a test that chooses its next measurement from earlier answers needs $\Theta(m^2\log m/\gamma^2)$ measurements in dimension $m$. A test that fixes all directions in advance needs $\Theta(m^3/\gamma^2)$. The paper gives matching bounds across confidence levels. Once the test finds a direction of positive curvature, it can certify a positive answer with repeated measurements along that direction. Certifying a negative answer has a higher minimax cost. Any polynomial saving over fixed designs requires at least order $\log m$ batches of measurements.
 
