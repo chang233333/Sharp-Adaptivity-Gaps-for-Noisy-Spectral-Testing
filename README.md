@@ -4,21 +4,64 @@ SMC · Beihang University · November 23, 2026
 
 [Read the preprint (PDF)](spectral-testing-github-20261123/spectral-testing.pdf)
 
-Can feedback help detect a single direction of positive curvature in an unknown symmetric matrix? Each measurement returns one noisy scalar, and the largest eigenvalue is separated from zero by a margin $\gamma$. At fixed error, a test that chooses its next measurement from earlier answers needs $\Theta(m^2\log m/\gamma^2)$ measurements in dimension $m$. A test that fixes all directions in advance needs $\Theta(m^3/\gamma^2)$. The paper gives matching bounds across confidence levels. Once the test finds a direction of positive curvature, it can certify a positive answer with repeated measurements along that direction. Certifying a negative answer has a higher minimax cost. Any polynomial saving over fixed designs requires at least order $\log m$ batches of measurements.
+## Overview
 
-## Reproducing the paper
+Can adaptive measurements detect a positive eigenvalue more efficiently than measurements chosen in advance?
 
-Run `tectonic spectral-testing.tex` in this directory to build the PDF from the [LaTeX source](spectral-testing.tex). The [figure](figures/confidence.pdf) plots the ratio of the two theoretical rates. Its [Python source](figures/confidence.py) is included.
+We study testing whether an unknown symmetric matrix has a positive eigenvalue using noisy scalar measurements.
 
-## Lean supplement
+Our results establish matching sample-complexity bounds:
 
-[MatrixEnergy.lean](lean/MatrixEnergy.lean) proves the trace inequality $|\operatorname{tr} Q|^2 \leq \operatorname{rank}(Q)\,\|Q\|_{\mathrm F}^2$ appearing in the confidence lower bound. The probabilistic arguments for the main theorems appear in the paper. The supplement includes a pinned Lean and mathlib configuration and the [archived verification output](lean/verification.txt). With Lean's toolchain manager installed, run
+| Measurement design | Sample complexity |
+|---|---|
+| Adaptive | $\Theta(m^2\log m/\gamma^2)$ |
+| Nonadaptive | $\Theta(m^3/\gamma^2)$ |
 
-```sh
-cd lean
+Here, $m$ is the matrix dimension and $\gamma$ is the eigenvalue separation margin. These bounds hold at fixed error probability.
+
+**Key results:**
+
+- Adaptivity reduces the required number of measurements by a factor of order $m/\log m$.
+- Positive and negative answers have different confidence costs.
+- Achieving a polynomial improvement over nonadaptive measurements requires at least order $\log m$ measurement batches.
+
+## Reproducing the Paper
+
+The repository includes the manuscript, LaTeX source, figures, and a Lean supplement.
+
+- [Paper (PDF)](spectral-testing-github-20261123/spectral-testing.pdf)
+- [LaTeX source](spectral-testing-github-20261123/spectral-testing.tex)
+- [Figure (PDF)](spectral-testing-github-20261123/figures/confidence.pdf)
+- [Figure generation (Python)](spectral-testing-github-20261123/figures/confidence.py)
+- [Lean supplement](spectral-testing-github-20261123/lean/MatrixEnergy.lean)
+- [Lean verification output](spectral-testing-github-20261123/lean/verification.txt)
+
+To compile the manuscript:
+
+```bash
+cd spectral-testing-github-20261123
+tectonic spectral-testing.tex
+```
+
+To build the Lean supplement:
+
+```bash
+cd spectral-testing-github-20261123/lean
 lake update
 lake exe cache get
 lake build
 ```
+
+## Citation and Feedback
+
+If you use this work in your research, please:
+
+1. Cite the original work using the repository's **Cite this repository** feature.
+2. Share your research or feedback through GitHub Issues.
+3. Consider starring this repository to support the research.
+
+Academic discussions and collaborations are welcome.
+
+---
 
 The manuscript and proof development received AI assistance.
