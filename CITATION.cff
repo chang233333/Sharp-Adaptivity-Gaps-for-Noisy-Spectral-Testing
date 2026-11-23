@@ -1,0 +1,8 @@
+
+cff-version: 1.2.0
+message: "If you use this work, please cite it and consider starring this repository."
+type: software
+title: "Sharp Adaptivity Gaps for Noisy Spectral Testing"
+authors:
+  - name: "SMC"
+url: "https://github.com/chang233333/Sharp-Adaptivity-Gaps-for-Noisy-Spectral-Testing"
