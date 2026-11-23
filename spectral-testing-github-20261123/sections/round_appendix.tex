@@ -1,0 +1,422 @@
+\section{Joint Gaussian approximation for quadratic observations}
+\label{app:projection}
+
+We prove the within-batch comparison used in \cref{lem:batch-comparison}. The joint law includes the observed path and the factor that generates the next batch. Controlling the marginal distribution of observations alone would lose this dependence.
+
+\subsection{A stopped covariance flow}
+
+Let $x\sim\N(0,I_p)$, let $L_1,\ldots,L_n\in\Sym_p$, and let
+\[
+ q_i(x)=\tfrac12x^\top L_i x-c_i.
+\]
+Consider the path experiment
+\begin{equation}
+ \dd Y_i(t)=q_i(x)\dd t+\dd B_i(t),\qquad 0\le t\le1.
+ \label{eq:quadratic-path}
+\end{equation}
+Conditional on $Y(1)=y$, its path is $ty+\operatorname{bridge}(t)$,
+where the bridge is independent of $x,y$. Its posterior for $x$ is therefore the posterior from the original endpoint observation.
+
+Under an auxiliary innovation law, set $C_0=I_p$ and
+\begin{equation}
+ \dd C_t=\sum_i C_tL_iC_t\dd W_i(t),\qquad
+ m_i(C)=\tfrac12\tr(L_iC)-c_i,\qquad
+ \dd Y_i(t)=m_i(C_t)\dd t+\dd W_i(t).
+ \label{eq:generic-flow}
+\end{equation}
+Write
+\[
+ A_i=C^{1/2}L_iC^{1/2},\qquad
+ R_{ij}(C)=\tr(L_iCL_jC),\qquad
+ \kappa(C)=\sum_{i,j}R_{ij}(C)^2.
+\]
+Stop at an energy boundary $\kappa(C)=\rho$, an upper spectral boundary
+$\norm C_{\op}=M$, or any additional specified stopping boundary.
+The stopping time is infinity if no boundary is reached. After stopping, freeze $C$ and retain the output drift $m(C)$.
+At time one, draw the auxiliary latent variable conditionally from $\N(0,C_{1\wedge\tau})$.
+
+The stopped flow stays positive definite. On any positive-definite interval, It\^o's formula gives
+\begin{equation}
+ \dd C_t^{-1}
+ =-\sum_iL_i\dd W_i(t)+\sum_iL_iC_tL_i\dd t.
+ \label{eq:inverse-flow}
+\end{equation}
+While $\norm{C_t}_{\op}\le M$, the inverse has bounded sample paths on finite time intervals. Thus it cannot reach a zero covariance eigenvalue before an upper boundary. Local strong existence and freezing define the full process. The bounded output drift also permits the change between Wiener reference measure and the auxiliary observation measure.
+
+\begin{lemma}[Energy and joint-kernel error]
+\label{lem:projection}
+For the stopped construction above, the drift and quadratic variation density of $\kappa$ satisfy
+\begin{equation}
+ b_\kappa\le6\kappa^{3/2},\qquad
+ \frac{\dd\ip{\kappa}{\kappa}_t}{\dd t}\le16\kappa^{5/2}.
+ \label{eq:kappa-generator}
+\end{equation}
+Let $P$ be the joint law of the true path \eqref{eq:quadratic-path} and its latent variable, and let $\widetilde P$ be the auxiliary joint endpoint law. If $\kappa(C_t)\le\rho$ before stopping, then
+\begin{equation}
+ \TV(P,\widetilde P)
+ \le\sqrt{3\rho/32}+\Prob_{\mathrm{aux}}(\tau\le1).
+ \label{eq:joint-projection}
+\end{equation}
+With only the energy and upper spectral boundaries, and
+$\kappa_0=\kappa(I_p)<\rho$,
+\begin{equation}
+ \Prob_{\mathrm{aux}}(\tau\le1)
+ \le\frac{\kappa_0e^{6\sqrt\rho}}{\rho}+\frac pM.
+ \label{eq:projection-stop}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+At the current covariance, define operators on the full matrix space by
+\[
+ \mathcal C_A=\sum_i|A_i\rangle\langle A_i|,
+ \qquad \mathcal S_A(X)=\sum_i A_iXA_i.
+\]
+Both have squared Hilbert-Schmidt norm $\kappa$.
+The first operator is positive semidefinite and the second is self-adjoint.
+The product rule gives
+\[
+ \dd R_{ij}
+ =2\sum_k\tr(A_iA_jA_k)\dd W_k
+    +\sum_k\tr(A_iA_kA_jA_k)\dd t.
+\]
+It follows that
+\[
+ b_\kappa=2\tr(\mathcal C_A^2\mathcal S_A)
+             +4\tr(\mathcal S_A^3).
+\]
+Since $\norm{\mathcal S_A}_{\op}\le\sqrt\kappa$,
+$\tr(\mathcal C_A^2)=\kappa$, and
+\[
+ \tr(\mathcal S_A^3)
+   =\sum_{i,j,k}[\tr(A_iA_jA_k)]^2\le\kappa^{3/2},
+\]
+the drift bound follows. Each martingale coefficient is
+\(4\sum_{i,j}R_{ij}\tr(A_iA_jA_k)\).
+Cauchy--Schwarz now gives the quadratic variation bound.
+Gronwall's inequality yields
+\[
+ \E_{\mathrm{aux}}\kappa(C_{t\wedge\tau})
+ \le\kappa_0 e^{6\sqrt\rho\,t}.
+\]
+The covariance is a bounded matrix martingale with
+$\E_{\mathrm{aux}}\tr C_{t\wedge\tau}=p$.
+An energy hit gives $\kappa=\rho$, and an upper spectral hit gives $\tr C\ge M$.
+These facts prove \cref{eq:projection-stop}.
+
+It remains to compare the full joint kernels. All operator traces and Hilbert--Schmidt norms in the preceding calculation use the full real $p\times p$ matrix space with Frobenius inner product, including the nonsymmetric directions. In particular $\mathcal S_A$ has matrix $\sum_i A_i\otimes A_i$ under vectorization.
+
+Let $\mu_C$ be the density of
+$\N(0,C)$. Before stopping, Gaussian density differentiation gives
+\begin{equation}
+ \frac{\dd\mu_{C_t}(x)}{\mu_{C_t}(x)}
+ =(q(x)-m(C_t))^\top\dd W_t+\tfrac12 W_{4,C_t}(x)\dd t,
+ \label{eq:gaussian-density-flow}
+\end{equation}
+where
+\[
+ W_{4,C}(x)
+ =\sum_i\left[
+   (q_i(x)-m_i(C))^2-x^\top L_iCL_ix
+                  +\tfrac12\tr(L_iCL_iC)\right].
+\]
+After whitening $x=C^{1/2}w$, $W_{4,C}$ is the homogeneous fourth Gaussian chaos with kernel $\tfrac14\operatorname{Sym}\sum_i A_i\otimes A_i$. Indeed, subtracting the second-order and constant contractions of $(w^\top A_iw-\tr A_i)^2/4$ gives the displayed polynomial. Symmetrization is an orthogonal projection. The squared norm before symmetrization is $\sum_{ij}\tr(A_iA_j)^2/16$. The Gaussian chaos isometry multiplies the squared kernel norm by $4!$, giving
+\begin{equation}
+ \E_{\mu_C}W_{4,C}=0,\qquad
+ \E_{\mu_C}W_{4,C}^2\le\tfrac32\kappa(C).
+ \label{eq:wick-moment}
+\end{equation}
+
+Use standard Wiener $Y$ as a reference measure. The true unnormalized latent density is
+\[
+ \sigma_t(x)=\phi(x)
+   \exp\!\left(q(x)^\top Y_t-\tfrac12\norm{q(x)}^2t\right),
+ \qquad \dd\sigma_t=\sigma_t q^\top\dd Y_t.
+\]
+Let $Z_t$ be the auxiliary output likelihood, so
+$\dd Z_t=Z_tm(C_t)^\top\dd Y_t$.
+For $\widehat\sigma_t=Z_t\mu_{C_t}$, the product rule in
+\cref{eq:gaussian-density-flow} gives
+\begin{equation}
+ \dd\widehat\sigma_t
+ =\widehat\sigma_tq^\top\dd Y_t
+       +\tfrac12\widehat\sigma_tW_{4,C_t}\dd t
+ \label{eq:zakai-defect}
+\end{equation}
+before stopping.
+
+On $E=\{\tau\le1\}$ set $\overline\sigma_1(x)=Z_\tau\mu_{C_\tau}(x)\Lambda_{\tau,1}(x)$, with $\Lambda$ the exact likelihood increment defined below. On $E^c$ set $\overline\sigma_1=\widehat\sigma_1$. For fixed $x$, the conditional mean of $\Lambda_{\tau,1}(x)$ under the reference measure is one on $E$. Bounded drift makes $Z$ a true martingale, so conditional Tonelli and optional sampling give $\E_{\rm ref}\int\overline\sigma_1(x)\dd x=\E_{\rm ref}Z_{\tau\wedge 1}=1$. Write $\overline P$ for this joint law. Variation of constants in \cref{eq:zakai-defect} gives
+\[
+ \overline\sigma_1(x)-\sigma_1(x)
+ =\tfrac12\int_0^1
+  \Lambda_{s,1}(x)\ind_{\{s<\tau\}}
+  \widehat\sigma_s(x)W_{4,C_s}(x)\dd s,
+\]
+where
+\[
+ \Lambda_{s,1}(x)=
+ \exp\!\left(q(x)^\top(Y_1-Y_s)
+       -\tfrac12\norm{q(x)}^2(1-s)\right).
+\]
+For each fixed $x$, its conditional expectation under Wiener reference measure is one. Tonelli's theorem and \cref{eq:wick-moment} therefore imply
+\[
+ \E_{\mathrm{ref}}\int
+   \abs{\overline\sigma_1-\sigma_1}\dd x
+ \le\tfrac12\int_0^1
+       \E_{\mathrm{aux}}\!\left[
+        \ind_{\{s<\tau\}}\E_{\mu_{C_s}}\abs{W_{4,C_s}}
+       \right]\dd s
+ \le\tfrac12\sqrt{3\rho/2}.
+\]
+Total variation is half this integrated $L^1$ distance, so
+$\TV(P,\overline P)\le\sqrt{3\rho/32}$.
+
+The law $\overline P$ and the frozen Gaussian law $\widetilde P$ agree before stopping and on the event of no stop. On $E$ both laws have mass $\E_{\rm ref}[\ind_E Z_\tau]=\E_{\rm ref}[\ind_E Z_1]$. Thus
+$\TV(\overline P,\widetilde P)\le\Prob_{\mathrm{aux}}(\tau\le1)$,
+which proves \cref{eq:joint-projection}. Additional stopping boundaries enter through this same probability.
+\end{proof}
+
+\subsection{Bounds for correlated rank-one factors}
+
+We record the estimates needed when the current factor covariance is $S\succ0$ on $\R^{2d}$. Let $F^\top F=T\preceq I$, write
+$E_i=\dil(\mat(F_i))/2$, set $a=\beta/\sqrt d$, and define
+\[
+ q=\tr(T)/d^2,\qquad
+ \kappa(S)=16a^4\sum_{i,j}[\tr(SE_iSE_j)]^2,
+ \qquad \Phi_p(S)=\tr(S^p)/(2d).
+\]
+
+\begin{lemma}
+\label{lem:physical-moments}
+For every such $S,F$,
+\begin{equation}
+ \kappa(S)\le8\beta^4\Phi_4(S)\sqrt q.
+ \label{eq:weighted-gram}
+\end{equation}
+Along the physical covariance flow
+$\dd S=2a\sum_iSE_iS\dd W_i$, its moment drifts satisfy
+\begin{align}
+ \operatorname{drift}\tr(S^2)
+   &\le\sqrt{\kappa(S)}\,\tr(S^2),\label{eq:physical-second}\\
+ \operatorname{drift}\Phi_4(S)
+   &\le12\beta^2\Phi_2(S)\Phi_4(S).
+ \label{eq:physical-fourth}
+\end{align}
+These bounds also hold before any additional stopping and freezing.
+\end{lemma}
+
+\begin{proof}
+Define
+$\mathcal A(H)=S^{1/2}\dil(H)S^{1/2}/2$ and
+$\mathcal M=\mathcal A^*\mathcal A$.
+The map $\mathcal E(H)=\dil(H)/\sqrt2$ is isometric. If
+$\mathcal S(X)=S^{1/2}XS^{1/2}$, then
+$\mathcal M=\mathcal E^*\mathcal S^2\mathcal E/2$.
+Compression and the eigenvalues of $\mathcal S^2$ imply
+\[
+ \tr(\mathcal M^4)\le2^{-4}[\tr(S^4)]^2.
+\]
+For the Gram matrix $G_{ij}=\tr(\mathcal A(F_i)\mathcal A(F_j))$,
+\[
+ \norm G_{\Frob}^2
+ =\tr(T\mathcal M T\mathcal M)
+ \le\tr(T^2\mathcal M^2)
+ \le[\tr(\mathcal M^4)]^{1/2}[\tr(T^4)]^{1/2}
+ \le\tfrac14\tr(S^4)\sqrt{\tr T}.
+\]
+The successive inequalities follow from the squared commutator norm, Schatten H\"older, and $0\preceq T\preceq I$.
+Multiplication by $16a^4$ proves \cref{eq:weighted-gram}.
+
+For \cref{eq:physical-second}, put
+$A_i=2aS^{1/2}E_iS^{1/2}$.
+Then $\kappa=\sum_{i,j}[\tr(A_iA_j)]^2$, and the quadratic variation contribution to $\tr(S^2)$ is
+\[
+ \sum_i\tr(SA_iSA_i)
+ =\ip{S}{\mathcal S_A(S)}
+ \le\sqrt\kappa\,\tr(S^2),
+\]
+using the Hilbert-Schmidt norm from the preceding proof.
+
+For every $X\succeq0$, the contraction $F^\top F\preceq I$ gives
+\begin{equation}
+ \sum_iE_iXE_i
+ \preceq\frac14
+ \begin{pmatrix}
+  \tr(X_{VV})I_d&X_{UV}\\
+  X_{VU}&\tr(X_{UU})I_d
+ \end{pmatrix}
+ \preceq\frac{\tr X}{4}I_{2d}.
+ \label{eq:positive-map}
+\end{equation}
+The first bound follows by completing the contraction to the full matrix-coordinate basis. The second follows from the positive-semidefinite block inequality and Cauchy-Schwarz.
+
+Set $H_i=2aSE_iS$. It\^o's formula gives the fourth-moment drift
+\[
+ \sum_i\left[4\tr(S^2H_i^2)+2\tr(SH_iSH_i)\right]
+ \le6\sum_i\tr(S^2H_i^2)
+ \le6a^2\tr(S^2)\tr(S^4).
+\]
+The first inequality uses the squared commutator of $S,H_i$. For the second, apply \cref{eq:positive-map} with $X=S^2$.
+Dividing by $2d$ proves \cref{eq:physical-fourth}.
+\end{proof}
+
+
+\section{Composition across batches}
+\label{app:rounds}
+
+We prove \cref{lem:batch-comparison} and complete the expectation-cost argument for \cref{thm:rounds}. All auxiliary moment calculations below are taken directly under $\mathsf Q$.
+
+\subsection{Conditional background distribution}
+
+The formulas in \cref{eq:innovations,eq:background-kernel} follow from Gaussian regression conditional on fixed factors. At the start of batch $j$, the conditional mean of $\theta_1=g_0+az$ is $\mu_{j-1}+a\Gamma_{j-1}z$, and its conditional covariance is $\Gamma_{j-1}$. Whitening produces mean $aF_jz$. The posterior covariance is $\Gamma_j=\Gamma_{j-1}-F_j^\top F_j$, while the mean update gives exactly \cref{eq:background-kernel}. In particular,
+\[
+ 0\preceq T_j\preceq\Gamma_{j-1}\preceq I,\qquad
+ \tr T_j\le\sigma^2\tr(L_j^\top L_j)\le2\sigma^2n_j,
+\]
+which is \cref{eq:batch-energy}.
+
+The independent bridges do not change this conditional kernel. A true path has constant drift conditional on the factors, so its endpoint is sufficient for the latent variables within the batch.
+
+Under $\mathsf Q$, freezing at $D(S)=1/4$ ensures, on every path,
+\begin{equation}
+ \Phi_2(S)\le(1+\sqrt{D(S)})^2\le9/4,
+ \qquad \norm S_{\op}\le1+\sqrt{2d}/2.
+ \label{eq:physical-domain}
+\end{equation}
+Positive definiteness follows from the physical inverse equation
+\[
+ \dd S^{-1}
+ =-2a\sum_iE_{ji}\dd W_{ji}
+       +4a^2\sum_iE_{ji}SE_{ji}\dd t.
+\]
+Each batch has fixed finite coefficients conditional on its prefix. The upper bound in \cref{eq:physical-domain} therefore prevents a zero eigenvalue on a finite batch interval. Continuing for finitely many batches defines a bounded positive-definite covariance martingale, with
+$\E_{\mathsf Q}S_t=I$.
+
+When applying \cref{lem:projection} conditionally at a batch start, whiten by $S_{\mathrm{start}}^{-1/2}$. A finite upper cutoff strictly above
+$(1+\sqrt{2d}/2)\norm{S_{\mathrm{start}}^{-1}}_{\op}$ cannot be reached before the physical stopping boundary. Thus the comparison requires no additional upper spectral stopping term.
+
+\subsection{Freezing probabilities}
+
+Let $p_{\mathrm{bad}}$ be the probability under $\mathsf Q$ of ever freezing by time $R$. While the process is active, $\kappa_j\le h^2$. Equation \eqref{eq:physical-second} and Gronwall's inequality imply
+\[
+ \E_{\mathsf Q}\tr(S_t^2)\le2d\,e^{ht}.
+\]
+Since $\E_{\mathsf Q}S_t=I$,
+\begin{equation}
+ \E_{\mathsf Q}D(S_t)\le e^{ht}-1.
+ \label{eq:D-bound}
+\end{equation}
+The nonnegative process $D(S_t)$ is a submartingale and freezes at its first boundary hit. Its boundary probability is at most $4(e^{hR}-1)$.
+
+Equations \eqref{eq:physical-domain} and \eqref{eq:physical-fourth} give
+\[
+ \E_{\mathsf Q}\Phi_4(S_R)\le e^{27\beta^2R}.
+\]
+The fourth spectral moment is also a nonnegative submartingale. Its probability of reaching $K$ is at most $e^{27\beta^2R}/K$.
+
+At every batch start before freezing, \cref{eq:weighted-gram} gives
+\[
+ \kappa_j(S_{\mathrm{start}})
+ \le8\beta^4K\sqrt q=\bar\kappa<h^2.
+\]
+Conditional on this prefix, \cref{eq:kappa-generator} bounds the expected stopped energy at the end of the batch by
+$\bar\kappa e^{6h}$. Its probability of reaching $h^2$ in that batch is at most $\bar\kappa e^{6h}/h^2$. Summing over the batches,
+\begin{equation}
+ p_{\mathrm{bad}}\le
+ 4(e^{hR}-1)+\frac{e^{27\beta^2R}}{K}
+             +\frac{R\bar\kappa e^{6h}}{h^2}.
+ \label{eq:pbad}
+\end{equation}
+The energy can change when a new design is chosen. The strict start bound above ensures that this change cannot itself trigger the energy boundary on an unfrozen history.
+
+\subsection{Joint-kernel replacement}
+
+Consider a prefix generated by $\mathsf Q$ that has not frozen. Conditional on $H_{j-1}$, its current factor distribution is a single centered Gaussian. Integrate out all prior hidden draws. Whitening the current factors reduces the quadratic observation to \eqref{eq:quadratic-path} with coefficients $2aS_{\rm start}^{1/2}E_{ji}S_{\rm start}^{1/2}$ and zero offsets. Its background distribution is the kernel \eqref{eq:background-kernel}. Conditional on this prefix, \cref{lem:projection} compares the true next-batch path and its latent factors with the Gaussian auxiliary endpoint kernel. The Wick source term contributes at most $\sqrt{3/32}\,h$. The additional error term is the conditional probability of a new freezing event.
+
+Attach \eqref{eq:background-kernel} to both compared endpoint kernels. This common conditional kernel cannot increase total variation. Subsequent true batches then evolve the same full state, including the fixed background. This is why the comparison uses the joint observation and factor law.
+
+For $j=0,\ldots,R$, define a hybrid experiment that uses the auxiliary joint kernels for the first $j$ batches and the true state transition thereafter. Consecutive hybrids share a prefix distributed as the first $j-1$ batches of $\mathsf Q$. Let $B_j$ be the event that $\mathsf Q$ has frozen by the end of batch $j$. On prefixes already frozen, use the bound one for total variation. On the other prefixes, use the preceding within-batch bound. The averaged distance between successive hybrids is at most
+\[
+ \sqrt{3/32}\,h+\mathsf Q(B_j).
+\]
+The triangle inequality yields
+\begin{equation}
+ \TV(P_1,\mathsf Q)\le
+ R\sqrt{3/32}\,h+Rp_{\mathrm{bad}}.
+ \label{eq:hybrid}
+\end{equation}
+All moment estimates are applied on the auxiliary prefixes where they were established.
+
+\subsection{The auxiliary output law}
+
+The output drift in the current batch is
+$m_j(S)=aF_j\vecop(S_{UV})$.
+Here $S_{UV}$ denotes the $d\times d$ upper-right block of $S$. Since $T_j\preceq I$,
+\begin{equation}
+ \norm{m_j(S)}^2
+ \le a^2\norm{S_{UV}}_{\Frob}^2
+ \le\frac{a^2}{2}\norm{S-I}_{\Frob}^2
+ =\beta^2D(S).
+ \label{eq:cross-block-drift}
+\end{equation}
+This includes the frozen histories. The right-hand side is at most $\beta^2/4$, so the required exponential integrability for the finite-time change of measure holds.
+
+The negative experiment has standard Wiener innovations in each augmented batch. Girsanov's identity, followed by the conditional KL chain rule, gives
+\[
+ \KL(\mathsf Q_{\mathrm{path}}\Vert P_{0,\mathrm{path}})
+ =\tfrac12\E_{\mathsf Q}\int_0^R\norm{m_j(S_t)}^2\dd t
+ \le\frac{\beta^2R}{2}(e^{hR}-1).
+\]
+Conditioning on each prefix fixes the next batch length and path dimension. Empty batches contribute zero. Private seeds have the same initial law under both hypotheses. Pinsker's inequality implies
+\begin{equation}
+ \TV(\mathsf Q_{\mathrm{path}},P_{0,\mathrm{path}})
+ \le\frac{\beta}{2}\sqrt{R(e^{hR}-1)}.
+ \label{eq:aux-null}
+\end{equation}
+Combining \cref{eq:pbad,eq:hybrid,eq:aux-null} proves
+\cref{lem:batch-comparison}. Discarding the bridges and retaining the test's visible endpoints can only reduce the distance.
+
+\subsection{Explicit constants}
+\label{app:round-constants}
+
+Use the parameters in \cref{eq:round-parameters}. Direct substitution gives
+\[
+ \bar\kappa
+ =8\beta^4K\sqrt{q_R}
+ =2^{-12}h^2/R^2<h^2.
+\]
+Also $hR\le2^{-16}$, $e^{hR}-1\le2hR$, and $e^{6h}\le2$.
+The four contributions to \cref{eq:hybrid}, after expanding
+\cref{eq:pbad}, are bounded respectively by
+\[
+ 2^{-16},\qquad 2^{-13},\qquad 2^{-10},\qquad 2^{-11}.
+\]
+Their sum is $105/65536<2^{-9}$.
+The square of the right side of \cref{eq:aux-null} is at most
+$\beta^2R^2h/2=2^{-17}$, so that distance is below $2^{-8}$.
+Thus $\TV(P_1,P_0)<3/512$.
+
+\subsection{From the Gaussian priors to expected cost}
+\label{app:expected}
+
+Here are the costs of enforcing the promises. For $G=\mat(g_0)$ and $d\ge128$, condition both inputs on $\|G\|_{\op}\le8\sqrt d$ and $\|G\|_{\Frob}\le 2d$. In the spiked law also require $\sqrt{d/2}\le\|U\|,\|V\|\le2\sqrt d$. Two $1/4$-nets of the unit sphere give
+$\Pr(\|G\|_{\op}>8\sqrt d)\le 2\exp[-(8-2\log9)d]$.
+For $X\sim\chi^2_k$, the Chernoff tails at $4k$ and $k/2$ are bounded by $e^{-(3-\log4)k/2}$ and $e^{-(\log2-1/2)k/2}$, respectively. Each conditioning costs less than $0.01$ in total variation. On these events the null off-diagonal block has norm at most $\gamma/2$ and the spiked block has norm at least $4\gamma-\gamma/2$. Their dilations, shifted by $-2\gamma I_m$, give the stated signs. The background block and the spike have Frobenius norms at most $\gamma\sqrt d/8$ and $32\gamma$, respectively. Using $(a+b)^2\le 2(a^2+b^2)$, the full matrix therefore has squared Frobenius norm at most $(4m+d/16+4096)\gamma^2<1$. Both inputs also satisfy $\|A\|_{\op}\le 34.5\gamma$.
+
+Write
+\[
+ N_*=\frac{128q_Rd^3}{\gamma^2}.
+\]
+Every integer hard cap $N\le N_*$ has legal-prior total variation below $1/2$ and hence cannot be $1/4$-correct.
+
+Let a test's worst-case expected cost be $B<\infty$. Suppose
+$N_*\ge2$ and $B<N_*/32$. Cap it at $N=\lceil16B\rceil$ observations. Then
+$N<N_*/2+1\le N_*$, and Markov's inequality adds at most $1/16$ to the error on every legal instance. The capped test is therefore $3/16$-correct, a contradiction. The remaining budget determines where to truncate a prescribed batch list. All subsequent batches are empty. It preserves the feedback restriction.
+
+It follows that
+\[
+ B\ge\frac{N_*}{32}
+   =\frac{4q_Rd^3}{\gamma^2}
+   \ge\frac{4q_R}{27}\frac{m^3}{\gamma^2}.
+\]
+For all dimensions the confidence lower bound in \cref{prop:confidence} at risk $1/8$ gives $B\ge c_0 m^2/\gamma^2$ for an absolute $c_0>0$. If $d<128$, then $m\le255$ and $mq_R\le255$. If $d\ge128$ but $N_*<2$, then $\gamma^{-2}\ge64m\ge128d$ gives $2^{14}q_Rd^4<2$, hence $mq_R\le 3dq_R<1$. In each case $B\ge c q_R m^3/\gamma^2$ with an absolute $c>0$, proving \eqref{eq:explicit-round}.

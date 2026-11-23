@@ -1,0 +1,125 @@
+\section{Round complexity lower bounds}
+\label{sec:rounds}
+
+Within each batch, the list of measurements is fixed by the preceding observations. A useful prior must therefore remain hard after conditioning on a random list. We track the conditional law of two latent Gaussian factors together with the background matrix they perturb. The error of this approximation grows at most exponentially with the number of batches.
+
+\subsection{Gaussian innovation representation}
+
+Let $d=\lfloor m/2\rfloor$, $\beta=128$, $\sigma=\gamma/(16\sqrt d)$ and $a=\beta/\sqrt d$. Write $\dil(D)$ for the symmetric matrix with off-diagonal blocks $D,D^\top$ and zero diagonal blocks (padded by zero in odd ambient dimension). The two input matrices have the form $-2\gamma I_m+\sigma\dil(\mat(\theta_b))$, $b\in\{0,1\}$, with unconditioned priors
+\[
+ \theta_0=g_0,\qquad
+ \theta_1=g_0+a z,\qquad
+ g_0\sim\N(0,I_{d^2}),\quad z=\vecop(UV^\top).
+\]
+Here $U,V$ are independent $d$-dimensional standard Gaussians independent of $g_0$, and $\mat$ inverts vectorization on $d\times d$ matrices. All three draws are fixed throughout a run. After subtracting the known intercept $-2\gamma\tr Q$ in each response, batch $j$ is a linear observation of $\sigma\theta_b$ with design matrix $L_j$ and independent unit noise. A row of $L_j$ is $\vecop(2Q_{12})^\top$ and hence has squared norm at most two. With $\Gamma_0=I$ and $\mu_0=0$, define
+\begin{align}
+ \Omega_j&=I+\sigma^2L_j\Gamma_{j-1}L_j^\top,\notag\\
+ y_j&=\Omega_j^{-1/2}(Y_j-\sigma L_j\mu_{j-1}),\notag\\
+ F_j&=\sigma\Omega_j^{-1/2}L_j\Gamma_{j-1},
+ \quad T_j=F_j^\top F_j,\label{eq:innovations}\\
+ \Gamma_j&=\Gamma_{j-1}-T_j,\qquad
+ \mu_j=\mu_{j-1}+F_j^\top y_j.\notag
+\end{align}
+Conditional on the latent factors and the previous transcript, the positive channel is
+\[
+ y_j=aF_jz+h_j,\qquad h_j\sim\N(0,I).
+\]
+The negative channel has standard Gaussian innovations. Gaussian conditioning gives the background kernel
+\begin{equation}
+ \mathcal L(g_0\mid U,V,H_j)
+ =\N\bigl(\mu_j-a(I-\Gamma_j)z,\Gamma_j\bigr).
+ \label{eq:background-kernel}
+\end{equation}
+The regression is conditional on the factors, so its form is independent of their mixing law.
+
+Every batch satisfies
+\begin{equation}
+ 0\preceq T_j\preceq I,\qquad
+ \tr T_j\le\frac{\gamma^2n_j}{128d}.
+ \label{eq:batch-energy}
+\end{equation}
+For a deterministic total cap $N$, write
+\[
+ q=\frac{\gamma^2N}{128d^3}.
+\]
+Then $\tr T_j/d^2\le q$ for every realized history.
+
+\subsection{Auxiliary covariance process}
+
+Augment the batch response to the path
+$y_j(t)=t y_j+\operatorname{bridge}_j(t)$, $0\le t\le1$, using a standard Brownian bridge.
+Conditional on the factors, this path has drift $aF_jz$.
+The bridge is sampled independently of the endpoint and of all hidden variables. Write $H_j$ for the algorithm's private coins and the augmented paths through batch $j$. During a batch the observation filtration grows only by the path seen so far. The design itself uses only the coins and the preceding endpoints.
+
+Let $E_{ji}=\dil(\mat((F_j)_i))/2$ on the factor space $\R^{2d}$, with $(F_j)_i$ the $i$th row in column form. In particular, $x^\top E_{ji}x=(F_j z)_i$ for $x=(U,V)$. In an auxiliary experiment
+$\mathsf Q$, the factors have a centered Gaussian distribution with covariance $S$, initially $I_{2d}$. During batch $j$, evolve
+\begin{align}
+ \dd S_t&=2a\sum_i S_tE_{ji}S_t\dd W_{ji}(t),\notag\\
+ \dd y_{ji}(t)&=a\tr(E_{ji}S_t)\dd t+\dd W_{ji}(t).
+ \label{eq:physical-flow}
+\end{align}
+Given the observation history at a batch endpoint, draw the current factors from $\N(0,S)$ and attach the background kernel \eqref{eq:background-kernel}. This constructs a comparison law on observations and the current hidden state. Hidden draws and the coins used to generate them are integrated out of $H_j$. The covariance evolution is the Gaussian projection filter for a static quadratic observation~\cite{brigo1999}. The joint error estimate needed to concatenate batches is proved in \cref{app:projection}.
+
+The quantities that control this comparison are
+\[
+ D(S)=\frac{\norm{S-I}_{\Frob}^2}{2d},
+ \qquad \Phi_p(S)=\frac{\tr(S^p)}{2d},
+\]
+and the current batch energy
+\[
+ \kappa_j(S)=16a^4\sum_{i,k}
+       [\tr(SE_{ji}SE_{jk})]^2.
+\]
+Choose $h>0$ and $K>1$. Freeze the covariance permanently at the first of the boundary hits
+\[
+ D(S)=1/4,\qquad \Phi_4(S)=K,\qquad \kappa_j(S)=h^2.
+\]
+After freezing, the output drift in \cref{eq:physical-flow} continues at the frozen covariance.
+
+\begin{lemma}[Batched comparison]
+\label{lem:batch-comparison}
+Let $\bar\kappa=8\beta^4K\sqrt q<h^2$.
+For the unconditioned transcript laws $P_0,P_1$ under a hard sample cap $N$,
+\begin{align}
+ \TV(P_1,P_0)
+ \le{}&R\sqrt{3/32}\,h \notag\\
+ &+R\left[
+ 4(e^{hR}-1)+\frac{e^{27\beta^2R}}{K}
+       +\frac{R\bar\kappa e^{6h}}{h^2}
+       \right]\label{eq:comparison-bound}\\
+ &+\frac{\beta}{2}\sqrt{R(e^{hR}-1)}.\notag
+\end{align}
+This bound holds for adaptive, randomized designs satisfying \cref{eq:batch-energy}.
+\end{lemma}
+
+The first line of \cref{eq:comparison-bound} is the cost of replacing the joint observation and factor kernel within each batch. The second line pays for every freezing event. The last line bounds the divergence of the auxiliary observations from the negative experiment. In particular, it includes the mean caused by the cross-covariance of $U$ and $V$.
+
+\subsection{Proof of the round lower bound}
+
+Set
+\begin{equation}
+ h=\frac{2^{-16}}{\beta^2R^2},\qquad
+ K=2^{10}R e^{27\beta^2R},\qquad
+ q_R=2^{-114}\beta^{-16}R^{-14}e^{-54\beta^2R}.
+ \label{eq:round-parameters}
+\end{equation}
+For $q\le q_R$, these choices give
+$\bar\kappa\le2^{-12}h^2/R^2$.
+Substitution in \cref{eq:comparison-bound} yields
+\begin{equation}
+ \TV(P_1,P_0)<3/512.
+ \label{eq:round-tv}
+\end{equation}
+The parameter calculation appears in \cref{app:round-constants}.
+
+For $d\ge128$, conditioning the two actual matrix priors on the spectral and Frobenius promises adds less than $0.02$ to their total variation distance (\cref{app:expected}). A test with risk $1/4$ on both classes would require distance at least $1/2$. Thus a deterministic cap $128q_Rd^3/\gamma^2$ is insufficient. Truncation of the stopping time, with the confidence lower bound for the small-dimensional cases, now gives
+\begin{equation}
+ N_R(m,\gamma,1/8)\ge c\,q_R m^3/\gamma^2 .
+ \label{eq:explicit-round}
+\end{equation}
+The details are in \cref{app:expected}. Since $\beta=128$,
+$q_R=2^{-226}R^{-14}e^{-884736R}$. Absorbing $R^{-14}$ into the exponential proves \cref{thm:rounds}. If a test uses at most $K_0 m^{3-\eta}(\log m)^s/\gamma^2$ queries in worst-case expectation, then
+\[
+ CR\ge\eta\log m-s\log\log m-\log(K_0/c')
+\]
+for absolute $c',C>0$. Every fixed $\eta>0$ therefore requires $R=\Omega_\eta(\log m)$ batches as $m$ grows.

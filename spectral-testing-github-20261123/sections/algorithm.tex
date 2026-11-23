@@ -1,0 +1,130 @@
+\section{An adaptive test with a deterministic budget}\label{sec:algorithm}
+
+The test measures a coarse approximation to the matrix and uses it to set the scale of a noisy Chebyshev iteration. On the negative class the iteration has a conserved quadratic energy in the absence of noise. A positive eigenvalue produces an expanding component. Several probe vectors, updated on a common scale, allow an inverse moment of this component to control the probability of missing it.
+
+\begin{proposition}\label{prop:adaptive-algorithm}
+Put \(L=\log(1024m)\) and \(T=\log(16/\delta)\). There is a test with error at most \(\delta\) on every promised matrix and a deterministic budget of at most
+\[
+ C\,m^2(L+T)/\gamma^2
+\]
+scalar observations. It uses at most \(1+C L\max\{1,(m/(L+T))^{1/4}\}\) batches, for a universal constant \(C\).
+\end{proposition}
+
+\paragraph{Setting the spectral scale.}
+Choose \(b=\min\{m,L+T\}\), and define
+\[
+ \tau=\gamma\sqrt{m/b},\qquad \eta=\frac{\gamma}{\gamma+2\tau},
+ \qquad k_0=\left\lceil 64b(1+T/m)/\gamma^2\right\rceil .
+\]
+Measure each member of a Frobenius-orthonormal basis of symmetric matrices \(k_0\) times in one batch. Coordinate averages give \(\widehat A=A+E\), with independent \(N(0,1/k_0)\) coordinates in this basis. For each unit vector \(u\), \(u^\top E u\) has variance \(1/k_0\). Approximating a top absolute Rayleigh direction by a point of a \(1/4\)-net of size \(9^m\) gives \(\|E\|_{\mathrm{op}}\le 2\max_{u\text{ in net}}|u^\top E u|\). Hence the event \(\mathcal G=\{\|E\|_{\mathrm{op}}\le\tau\}\) has
+\[
+ \Pr(\mathcal G^c)\le 2\cdot 9^m e^{-k_0\tau^2/8}\le e^{-T}.
+\]
+The test forms \(P=(|\widehat A|+\tau I)^{-1/2}\), where \(|\widehat A|\) has eigenvalues \(|\lambda_i(\widehat A)|\) in the eigenbasis of \(\widehat A\). Write \(C_A=PAP\). On \(\mathcal G\), the inequalities \(\pm A\preceq |\widehat A|+\tau I\) place its spectrum in \([-1,1]\). A negative input gives \(C_A\prec0\). For a positive input take \(Au=\lambda u\), \(\|u\|_2=1\), \(\lambda\ge\gamma\). Cauchy--Schwarz gives
+\[
+ u^\top|\widehat A|u\le\|\widehat A u\|_2\le\lambda+\tau .
+\]
+The Rayleigh quotient of \(C_A\) at \(P^{-1}u\) is therefore at least \(\lambda/(\lambda+2\tau)\ge\eta\). With \(\rho=1-\eta/2\), \(a=2-\eta\) and \(B=a C_A+\rho I\), the two cases now obey
+\[
+ \|B\|_{\mathrm{op}}\le\rho \quad\text{on the negative class},\qquad
+ \lambda_{\max}(B)\ge 1+\eta \quad\text{on the positive class}.
+\]
+Here \(0<\eta\le 1/3\). The transform \(P\) is known after the first batch. All subsequent products involving \(C_A\) are measured.
+
+\paragraph{A block update from scalar observations.}
+Set
+\[
+ p=2\left\lceil\frac{T}{2L}\right\rceil,\quad s=p+2,\quad d=ms,\quad
+ r=\left\lceil\frac{8L}{\sqrt\eta}\right\rceil,\quad
+ k=\left\lceil\frac{256(d+2p)}{\tau^2\eta^{3/2}}\right\rceil .
+\]
+Start with \(X_{-1}=0\) and an \(m\times s\) matrix \(X_0\) of independent standard Gaussians drawn by the test. Given \(X=X_{j-1}\), put \(F=\|X\|_F\), \(v_h=X_{\cdot h}/F\) and \(k_h=\max\{1,\lceil k\|v_h\|_2^2\rceil\}\). Set \(v_h=0\) when \(F=0\). For \(i\le m\), \(h\le s\), let
+\[
+ W_{ih}=\tfrac12\big[(Pe_i)(Pv_h)^\top+(Pv_h)(Pe_i)^\top\big],
+ \qquad \ell_{ih}=\|W_{ih}\|_F\le\|v_h\|_2/\tau .
+\]
+Measure \(W_{ih}/\ell_{ih}\) independently \(k_h\) times and multiply the average by \(\ell_{ih}\). This gives mean \(e_i^\top C_A v_h\) and variance \(\ell_{ih}^2/k_h\le1/(\tau^2k)\). For \(\ell_{ih}=0\), use zero queries and take the estimate zero. Add independent Gaussian noise to each estimate to bring its variance to \(1/(\tau^2k)\). Since \(\sum_h k_h\le k+s\), this costs at most \(m(k+s)\) scalar queries in one batch. Zero queries can pad each batch to that length.
+
+Multiplying the resulting matrix of estimates by \(2aF\) and adding \(2\rho X_{j-1}-X_{j-2}\) implements the recursion
+\begin{equation}\label{eq:upper-recurrence}
+ X_j=2BX_{j-1}-X_{j-2}+\xi_j,\qquad
+ \nu_j=\frac{4a^2\|X_{j-1}\|_F^2}{\tau^2 k}.
+\end{equation}
+Conditioned on the past, the entries of \(\xi_j\) are independent centered Gaussians of variance \(\nu_j\). In particular all columns have the same conditional noise scale even if their norms differ substantially. After \(r\) updates the test reports the positive class precisely when
+\[
+ S_r^2=\|X_r\|_F^2+\|X_{r-1}\|_F^2>H^2,\qquad
+ H^2=\frac{2(d+2p)}{\eta}\exp(r\sqrt\eta/4).
+\]
+
+\paragraph{The negative class.}
+Condition on any first-batch outcome in \(\mathcal G\). For \(m\times s\) matrices use the Frobenius inner product and define
+\[
+ D(x,y)=\|x\|_F^2+\|y\|_F^2-2\langle Bx,y\rangle .
+\]
+Expanding the squares gives \(D(2Bx-y,x)=D(x,y)\). Since \(\|B\|_{\mathrm{op}}\le\rho\),
+\[
+ D(x,y)\ge(1-\rho)(\|x\|_F^2+\|y\|_F^2),\qquad
+ D(x,y)=\|Bx-y\|_F^2+\langle x,(I-B^2)x\rangle .
+\]
+Write \(D_j=D(X_j,X_{j-1})\). Given \(x=X_{j-1}\), \(y=X_{j-2}\), \(D=D_{j-1}>0\), the conditional law is
+\[
+ \frac{D_j}{D}\ \stackrel{\rm law}{=}\ 
+ 1-z^2+\|z e_1+\sqrt v\,g\|_2^2,\qquad
+ z=\|Bx-y\|_F/\sqrt D\le 1,\quad
+ v=\nu_j/D\le \frac{32}{\tau^2 k\eta},
+\]
+where \(g\sim N(0,I_d)\). This follows by rotating the vector of entries of \(Bx-y\). If \(D=0\), both matrices are zero and \(D_j=0\).
+
+For \(Y=1-z^2+\|z e_1+\sqrt v\,g\|_2^2\) the moment-generating function near zero is
+\[
+ e^u(1-2vu)^{-d/2}\exp\!\left(\frac{2vz^2 u^2}{1-2vu}\right).
+\]
+Every Taylor coefficient increases weakly with \(z^2\), so the \(p\)th moment is largest at \(z=1\). For that value the Gaussian moment expansion gives
+\[
+ \mathbb E Y^p
+ =\sum_{j=0}^p\binom{p}{j}v^j
+      \prod_{i=0}^{j-1}(d+2p-2-2i)
+ \le [1+v(d+2p)]^p.
+\]
+Indeed, apply the polynomial heat operator \(\exp(v\Delta/2)\) to \(\|x\|^{2p}\) at \(e_1\), using \(\Delta\|x\|^{2q}=2q(d+2q-2)\|x\|^{2q-2}\). The choice of \(k\) gives \(v(d+2p)\le\sqrt\eta/8\). Since \(D_0\sim\chi_d^2\), \(\mathbb E D_0^p\le(d+2p)^p\). Iterating the conditional bound and using \(S_r^2\le2D_r/\eta\), we obtain
+\[
+ \Pr(S_r>H\mid\widehat A)
+ \le \exp(-pr\sqrt\eta/8)\le e^{-pL}\le e^{-T}.
+\]
+
+\paragraph{The positive class.}
+Fix any first-batch outcome in \(\mathcal G\) and let \(w\) be a top unit eigenvector of \(B\) with eigenvalue \(\beta\). Put \(\alpha=\operatorname{arcosh}\beta\), so that \(\alpha\ge\sqrt\eta\) by \(\cosh(\sqrt\eta)\le1+\eta\). The projected difference \(z_j=w^\top X_j-e^{-\alpha}w^\top X_{j-1}\) satisfies
+\[
+ z_j=e^\alpha z_{j-1}+\sqrt{\nu_j}\,g_s,\qquad g_s\sim N(0,I_s)
+\]
+conditionally on the past, since \(e^\alpha+e^{-\alpha}=2\beta\).
+
+The reason for choosing \(s=p+2\) appears here. For \(g_s\sim N(0,I_s)\), \(\mu\ne0\) and \(\sigma>0\), a Gaussian integration gives
+\[
+ \mathbb E\|\mu+\sigma g_s\|_2^{-p}
+ =\frac{1}{\Gamma(p/2)}
+    \int_0^{1/(2\sigma^2)}u^{p/2-1}e^{-u\|\mu\|_2^2}\,du
+ \le \|\mu\|_2^{-p}.
+\]
+To see the identity, insert the Laplace integral for \(r^{-p}\) and substitute \(u=t/(1+2\sigma^2t)\) after integrating over \(g_s\). The powers of \(1+2\sigma^2t\) cancel because \(s=p+2\). The inequality extends to \(\sigma=0\) by equality. Thus
+\[
+ \mathbb E\|z_r\|_2^{-p}
+ \le e^{-pr\alpha}\mathbb E\|z_0\|_2^{-p}
+ =e^{-pr\alpha}\frac{2^{-p/2}}{\Gamma(1+p/2)}
+ \le e^{-pr\alpha}(e/p)^{p/2},
+\]
+where all expectations condition on the coarse estimate. The finite initial inverse moment and this recursion also give zero probability of a vanishing projected difference. Since \(\|z_r\|_2\le\sqrt2 S_r\), Markov's inequality gives
+\[
+ \Pr(S_r\le H\mid\widehat A)
+ \le [H\sqrt{2e/p}\,e^{-r\alpha}]^p \le e^{-T}.
+\]
+For the last step, \(d+2p\le3mp\), \(\eta^{-1}\le 3\sqrt m\), and
+\(\sqrt{12em/\eta}\le e^L\), whereas \(r\sqrt\eta\ge8L\).
+Adding \(\Pr(\mathcal G^c)\) gives error at most \(2e^{-T}\le\delta\) on either class.
+
+\paragraph{Counting observations.}
+The exact padded budget is
+\[
+ \frac{m(m+1)}2\,k_0 + m(k+s)r .
+\]
+The first term is \(O(m^2(b+T)/\gamma^2)\) since \(b\le m\). In the second term use \(d+2p\le3mp\), \(s\le2p\), \(r\le 9L/\sqrt\eta\), and \(\tau\eta\ge\gamma/3\). The part of \(k\) before rounding contributes \(O(m^2pL/\gamma^2)\). Rounding and the extra \(s\) queries per row cost \(O(mpL/\sqrt\eta)\), absorbed by the same bound since \(\eta^{-1}\le3\sqrt m\) and \(\gamma\le1\). Finally \(pL\le T+2L\), \(b\le L+T\), and \(1/\sqrt\eta\le\sqrt3(m/b)^{1/4}\). These estimates give both bounds of Proposition~\ref{prop:adaptive-algorithm}.

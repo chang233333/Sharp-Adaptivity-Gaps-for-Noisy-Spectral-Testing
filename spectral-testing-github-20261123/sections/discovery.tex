@@ -1,0 +1,270 @@
+\section{The cost of discovering the spectral sign}\label{sec:discovery}
+
+We prove that for some absolute \(c>0\), every test with error at most
+\(1/8\) on each input has worst-case expected cost at least
+\(c m^2\log(m)/\gamma^2\).
+A rank-one perturbation changes the answer even when its two factors
+remain largely unknown. We bound the distance between the two
+\emph{observation laws} through the posterior mean of their common
+Gaussian background. This proves a lower bound for the decision itself.
+
+\subsection{Two matrix priors and the information in their factors}
+
+Put \(d=\lfloor m/2\rfloor\), \(\beta=128\),
+\(\sigma=\gamma/(16\sqrt d)\), \(a=\beta/\sqrt d\), and
+\(\theta=\sigma a=8\gamma/d\). Draw independent standard Gaussian
+vectors \(U,V\in\mathbb R^d\) and a matrix \(G\in\mathbb R^{d\times d}\)
+with independent standard Gaussian entries. Write
+\(\mathcal D(B)=\bigl(\begin{smallmatrix}0&B\\ B^\top&0\end{smallmatrix}\bigr)\),
+with a zero row and column appended when \(m\) is odd. Under
+law \(P_i\), \(i\in\{0,1\}\), the unknown matrix is
+\[
+ A_i=-2\gamma I_m+\sigma\mathcal D(G+i a UV^\top).
+\]
+We use the full Gaussian priors until the last step of the proof.
+Given a symmetric query \(Q\), take \(D=2Q_{12}\) from its two
+\(d\)-dimensional blocks. Removing the known shift from the answer gives
+\begin{equation}\label{eq:disc-observation}
+ Y=\sigma\langle D,G\rangle+i\theta U^\top D V+\xi,
+ \qquad \|D\|_{\mathrm F}^2\le2,\qquad \xi\sim N(0,1).
+\end{equation}
+Fix a deterministic budget \(n\). After an early decision the algorithm
+can fill out the transcript with zero queries. Let \(\mathcal H_j\)
+denote its seed and the first \(j\) responses.
+
+\begin{lemma}\label{lem:disc-information}
+Under \(P_1\), let
+\(S_j=I(U;\mathcal H_j\mid V,G)+I(V;\mathcal H_j\mid U,G)\).
+Then \(S_n\le \exp(256\gamma^2 n/d^2)-1\).
+\end{lemma}
+
+\begin{proof}
+Write the two summands as \(J_U(j)\) and \(J_V(j)\).
+For fixed \(V,G\) the likelihood along the realized history is a product
+of Gaussian densities linear in \(U\) in their means. The query at each
+step is specified by the preceding responses and seed. Completing the
+square gives conditional covariance
+\[
+ C_{U,j}=\Big[I+\theta^2\sum_{\ell=1}^j
+       (D_\ell V)(D_\ell V)^\top\Big]^{-1}\preceq I.
+\]
+For \(D=D_{j+1}\), the Gaussian channel in the next scalar answer therefore
+increases \(J_U\) by
+\(\tfrac12\mathbb E_1\log(1+\theta^2(DV)^\top C_{U,j}DV)\).
+To bound this quantity with \(D\) chosen from the data, apply the entropy
+variational inequality conditionally on \(\mathcal H_j\). For fixed \(D\)
+and any law \(\rho\) with relative entropy \(r\) to \(N(0,I_d)\),
+\[
+ \mathbb E_\rho\|DV\|^2
+ \le 2\|D\|_{\mathrm F}^2+4\|D\|_{\mathrm{op}}^2r.
+\]
+Indeed, for \(D\ne0\) use \(\lambda=(4\|D\|_{\mathrm{op}}^2)^{-1}\):
+the Gaussian log moment generating function at \(\lambda\) is
+\(-\tfrac12\log\det(I-2\lambda D^\top D)
+ \le 2\lambda\|D\|_{\mathrm F}^2\). The zero query gives the inequality directly.
+For \(\rho=\mathcal L_1(V\mid\mathcal H_j)\), the expected entropy is
+\(I(V;\mathcal H_j)\le J_V(j)\), by independence of \(V\) from \((U,G)\).
+It follows that
+\(J_U(j+1)-J_U(j)\le2\theta^2+4\theta^2J_V(j)\).
+The same argument with \(D^\top\) interchanges \(U\) and \(V\).
+Thus \(1+S_{j+1}\le(1+4\theta^2)(1+S_j)\), starting at \(S_0=0\).
+\end{proof}
+
+\subsection{A bound on the distance between the transcript laws}
+
+Identify matrices with vectors by a fixed vectorization, and set
+\(g=\operatorname{vec}(G)\), \(z=\operatorname{vec}(UV^\top)\).
+During the \(j\)th unit interval take \(q_t=\operatorname{vec}(D_j)\)
+and observe
+\[
+ dY_t=\sigma q_t^\top (g+i a z)\,dt+dW_t,\qquad j-1<t\le j.
+\]
+The original strategy reads the unit increments. Conditional on these
+increments and the seed, the extra paths are independent standard
+Brownian bridges translated by the linear interpolants. They carry no
+further information at time \(n\). Denote the enlarged observed
+filtration by \(\mathcal F_t\). In what follows \(P_i^t\) is the law
+on this filtration up to time \(t\), also for a bounded stopping time.
+
+Introduce the matrices and vector
+\begin{align*}
+ K_t&=\sigma^2\int_0^t q_s q_s^\top ds,&
+ C_t&=(I+K_t)^{-1},& T_t&=I-C_t,\\
+ s_t&=\sigma\int_0^t q_s\,dY_s,&
+ \mu_t&=C_t s_t,& F_t&=\sigma q_t^\top C_t .
+\end{align*}
+Matrix differentiation gives \(dT_t=F_t^\top F_t\,dt\).
+In particular \(0\preceq T_t\preceq I\) and
+\(\operatorname{tr}T_t\le\operatorname{tr}K_t\le k\), where
+\(k=2\sigma^2n\). For a fixed latent vector \(h=g+i a z\), the
+likelihood relative to a Wiener observation is
+\[
+ L_t(h)=\exp(h^\top s_t-\tfrac12 h^\top K_t h).
+\]
+For fixed \(h\) its drift has squared integral bounded by
+\(2n\sigma^2\|h\|^2\), so the exponential is a true martingale up to \(n\).
+Integration over the prior gives the mixture likelihood, including at
+bounded observation stopping times. Under \(P_0\) the posterior mean of
+\(g\) is \(\mu_t\). Under \(P_1\), completing the square in \(g\)
+at fixed \(U,V,\mathcal F_t\) gives the conditional law
+\(N(\mu_t-aT_t z,C_t)\). Consequently the predictive drift of \(Y\)
+under \(P_1\) exceeds that under \(P_0\) by
+\begin{equation}\label{eq:disc-drift}
+ b_t=aF_t\,\mathbb E_1[z\mid\mathcal F_t].
+\end{equation}
+Subtracting each law's predictive drift gives an observed Brownian
+innovation: the resulting continuous martingale has quadratic variation \(t\).
+The likelihood ratio of the two positive mixture densities has stochastic
+logarithm \(b_t\) against the null innovation. Indeed, relative to Wiener measure each positive mixture likelihood has a stochastic logarithm by Brownian martingale representation. Girsanov's theorem and uniqueness of the observed drift identify its integrand with the posterior mean drift. The quotient rule then gives the stated stochastic logarithm.
+For the observed stopping times \(\tau\le n\) this yields
+\begin{equation}\label{eq:disc-KL}
+ D_{\mathrm{KL}}(P_1^\tau\Vert P_0^\tau)
+   =\tfrac12\mathbb E_1\int_0^\tau b_t^2\,dt .
+\end{equation}
+The stochastic integral in the alternative log likelihood is integrable,
+since conditional Jensen and \(T_n\preceq I\) bound
+\(\mathbb E_1\int b_t^2dt\le a^2\mathbb E_1[z^\top T_nz]
+\le a^2d^2\).
+
+The following decomposition gives a sharper estimate close to the
+start of the experiment. Define two matrix-valued martingales
+\[
+ \widehat G_t=\mathbb E_1[G\mid\mathcal F_t],\qquad
+ M_t=\mathbb E_1[G(VV^\top-I)\mid\mathcal F_t].
+\]
+They start at zero and are square integrable. They have continuous
+versions: their Wiener posterior numerators and the strictly positive
+denominator are continuous martingales, conditional on the independent
+seed. Gaussian integration by parts in \(U_i\) and then in each \(G_{i\ell}\)
+gives
+\begin{equation}\label{eq:disc-Stein}
+ \mathbb E_1[UV^\top\mid\mathcal F_t]=a(\widehat G_t+M_t).
+\end{equation}
+In detail, along a fixed path
+\(\partial_{U_i}L_t=a\sum_\ell V_\ell\partial_{G_{i\ell}}L_t\).
+Multiply by \(V_j\), integrate against the prior and divide by its
+likelihood. The two integration-by-parts identities give, respectively,
+the conditional moments of \(U_iV_j\) and
+\(a\sum_\ell G_{i\ell}V_\ell V_j\). To justify the operations, note
+that \(s_t\) belongs to the range of \(K_t\) because the directions are
+piecewise constant. Thus \(L_t\) is bounded as a function of \(h\) on
+each realized path. Its first derivatives are bounded there by a
+path-dependent constant times a polynomial in the latent variables.
+The same argument applies along a stopped path.
+
+For a bounded stopping time \(\tau\), total conditional variance gives
+\(\operatorname{Cov}_1(g\mid\mathcal F_\tau)\succeq C_\tau\).
+Subtracting the trace of this inequality from the prior variance yields
+\(\mathbb E_1\|\widehat G_\tau\|_{\mathrm F}^2\le \mathbb E_1\operatorname{tr}T_\tau\le k\).
+Also, for any continuous square-integrable vector martingale \(X\) starting
+at zero under \(P_1\),
+\begin{equation}\label{eq:disc-energy}
+ \mathbb E_1\int_0^\tau |F_t X_t|^2dt\le\mathbb E_1\|X_\tau\|^2 .
+\end{equation}
+Indeed, apply It\^o's formula to \(X_t^\top C_t X_t\) using
+\(dC_t=-F_t^\top F_t\,dt\). The terminal quadratic form is nonnegative
+and the expected quadratic-variation term
+\(\mathbb E_1\int_0^\tau\operatorname{tr}(C_t\,d\langle X\rangle_t)\)
+is at most \(\mathbb E_1\|X_\tau\|^2\). Stopping first on a bounded
+ball and passing to the limit justifies the expectation.
+If \(\tau\) stops \(M\) when \(\|M_t\|_{\mathrm F}\) first reaches \(L>0\),
+or at \(n\) if it does not, equations
+\eqref{eq:disc-drift}--\eqref{eq:disc-energy} give
+\begin{equation}\label{eq:disc-stop}
+ D_{\mathrm{KL}}(P_1^\tau\Vert P_0^\tau)
+ \le a^4(k+L^2).
+\end{equation}
+
+It remains to bound the probability of reaching \(L\).
+For any law \(\rho\) with entropy \(r\) relative to \(N(0,I_d)\),
+write \(S_\rho=\mathbb E_\rho VV^\top\). We have
+\begin{equation}\label{eq:disc-coventropy}
+ \|S_\rho-I\|_{\mathrm F}\le2\sqrt r+4r .
+\end{equation}
+The Gaussian maximizes entropy at a given second moment, so
+\(\sum_j f(\lambda_j(S_\rho))\le2r\), with \(f(x)=x-1-\log x\).
+Here finite relative entropy gives a finite second moment by the
+Gaussian moment generating function. The scalar inequality
+\(|x-1|\le\sqrt{2f(x)}+2f(x)\) follows by integrating \(f'\)
+on either side of one, using \(f(x)\ge (1-x)^2/2\) below one and
+\(f(x)\ge(x-1)^2/(2x)\) above one. Taking the Euclidean norm of
+these eigenvalue bounds proves \eqref{eq:disc-coventropy}.
+
+Take \(\rho=\mathcal L_1(V\mid G,\mathcal F_n)\). Its expected relative
+entropy is \(I(V;\mathcal F_n\mid G)\le J_V(n)\le S_n\). On
+\(\|G\|_{\mathrm{op}}\le8\sqrt d\), condition first on \(G,\mathcal F_n\)
+and use \eqref{eq:disc-coventropy} and Jensen's inequality. The
+complement costs at most
+\[
+ (d+\sqrt d)\,\mathbb E[\|G\|_{\mathrm{op}}
+             \mathbf 1_{\{\|G\|_{\mathrm{op}}>8\sqrt d\}}],
+\]
+since \(V\) is independent of \(G\) before observing \(Y\).
+A \(1/4\)-net on each unit sphere has size at most \(9^d\), giving
+\(\Pr(\|G\|_{\mathrm{op}}>x)\le2\cdot9^{2d}e^{-x^2/8}\).
+Integrating above \(8\sqrt d\) shows, for absolute \(c,C>0\),
+\[
+ \mathbb E_1\|M_n\|_{\mathrm F}
+ \le 16\sqrt{dS_n}+32\sqrt d\,S_n+C d^{3/2}e^{-cd}
+ =:B_n .
+\]
+
+Doob's maximal inequality gives \(P_1(\tau<n)\le B_n/L\).
+For each test function \(0\le f\le1\) on the full transcript,
+\(f_\tau=\mathbb E_0[f\mid\mathcal F_\tau]\) equals \(f\) on
+\(\{\tau=n\}\) under both equivalent path laws. Hence
+\(|\mathbb E_1f-\mathbb E_0f|\le P_1(\tau<n)+
+ |\mathbb E_1 f_\tau-\mathbb E_0 f_\tau|\).
+Pinsker's inequality and \eqref{eq:disc-stop} give the desired
+transcript bound
+\begin{equation}\label{eq:disc-finalTV}
+ \|P_1^n-P_0^n\|_{\mathrm{TV}}\le \frac{B_n}{L}
+                 +a^2\sqrt{(k+L^2)/2}.
+\end{equation}
+
+\subsection{Restriction to the promised classes and expected cost}
+
+Take \(n\le d^2\log(d)/(4096\gamma^2)\) and \(L=d^{3/4}\).
+Lemma~\ref{lem:disc-information} gives \(S_n\le d^{1/16}\), and
+\(k\le d\log(d)/2^{19}\). The first term of \eqref{eq:disc-finalTV}
+is \(O(d^{-3/16})\), the second \(O(d^{-1/4}+\sqrt{\log(d)/d})\).
+Thus the total variation is at most \(1/8\) for all \(d\) larger than
+an absolute constant, uniformly in \(\gamma\) and in the test.
+
+Condition the null prior on \(\|G\|_{\mathrm{op}}\le8\sqrt d\) and
+\(\|G\|_{\mathrm F}\le2d\). Under the alternative require these same events
+and \(\sqrt{d/2}\le\|U\|,\|V\|\le2\sqrt d\).
+The net bound just proved and the Gaussian chi-square tail bounds show
+that the removed prior mass is \(O(e^{-c d})\) in each case.
+On these events \(\|\sigma G\|_{\mathrm{op}}\le\gamma/2\) and
+\(4\gamma\le\|\theta UV^\top\|_{\mathrm{op}}\le32\gamma\).
+The maximal eigenvalue of the dilation equals the largest singular
+value of its off-diagonal block. Consequently \(A_0\) has top
+eigenvalue at most \(-3\gamma/2\), and that of \(A_1\) is at least
+\(3\gamma/2\). Both matrices obey \(\|A_i\|_{\mathrm{op}}<35\gamma\).
+Moreover, the shift is Frobenius-orthogonal to the dilation, so
+\[
+ \|A_i\|_{\mathrm F}^2
+ \le 4m\gamma^2+4\sigma^2\|G\|_{\mathrm F}^2
+                  +4i\theta^2\|U\|^2\|V\|^2
+ \le (4m+d/16+4096)\gamma^2\le1
+\]
+for all sufficiently large \(d\).
+Conditioning a prior costs its excluded mass in total variation, and
+a common observation kernel contracts this distance. The two legal
+transcript laws are therefore within \(1/4\) of one another for large \(d\).
+
+Suppose now that the worst-case expected cost on legal inputs is \(B\).
+Truncating the procedure at \(n=\lceil32B\rceil\) increases its
+per-input error to at most \(5/32\). Its positive-decision probabilities
+on the two legal mixtures must differ by at least \(11/16\). This
+contradicts the preceding bound whenever
+\(\lceil32B\rceil\le d^2\log(d)/(4096\gamma^2)\).
+It follows that \(B\ge c m^2\log(m)/\gamma^2\) for all sufficiently
+large \(m\). For the remaining dimensions \(\log m\) is bounded by an
+absolute constant, and Proposition~\ref{prop:confidence} at error
+\(1/8\) gives the same conclusion with a smaller \(c\).
+Finally, a test with any error \(\delta\le1/8\) also satisfies this
+fixed-error bound. Taking its maximum with Proposition~\ref{prop:confidence}
+gives \(B\ge c' m^2(\log m+\log(1/\delta))/\gamma^2\).
+

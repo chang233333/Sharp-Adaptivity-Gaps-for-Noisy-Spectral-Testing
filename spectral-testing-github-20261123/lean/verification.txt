@@ -1,0 +1,7 @@
+Archived Lean output for the four declarations reproduced in MatrixEnergy.lean.
+Lean 4.35.0, mathlib commit 56a005855ea17e0b0958f73ec801ae140b0a1679.
+
+'LatentLimits.MatrixEnergy.trace_transpose_product' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LatentLimits.MatrixEnergy.trace_sq_le_frame_energy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LatentLimits.MatrixEnergy.exists_orthonormal_column_frame' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LatentLimits.MatrixEnergy.trace_sq_le_rank_frobenius' depends on axioms: [propext, Classical.choice, Quot.sound]

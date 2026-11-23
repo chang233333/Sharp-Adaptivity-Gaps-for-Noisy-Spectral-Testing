@@ -1,0 +1,21 @@
+\section{A comparison with noisy power iteration}\label{sec:oja}
+
+We give a short derivation of the fixed-risk \(O(m^2\log^2 m/\gamma^2)\) bound from the matrix-product second-moment estimate of Gu et al.~\cite[Lemma~3]{gu2026}. This makes the cost of converting a streaming matrix update to observations of the form \eqref{eq:observation} explicit.
+
+Write \(M=I+A\succeq0\). At a current unit vector \(v\), query \(Q_i=(e_iv^\top+ve_i^\top)/2\) for \(i=1,\dots,m\). Since \(\|Q_i\|_F^2=(1+v_i^2)/2\le1\), these \(m\) samples implement \(Av+g\), \(g\sim N(0,I_m)\). Starting with \(x_0\sim N(0,I_m)\), this implements an update with the conditional law \(x_j=(I+\eta[M+G_j])x_{j-1}\) using \(m\) observations, where \(G_j\) has independent standard Gaussian entries. Indeed \(G_j v\) has the law of \(g\) conditional on the past. We can therefore analyze independent \(G_j\)'s and \(x_0\). Set \(P_T=(I+\eta[M+G_T])\cdots(I+\eta[M+G_1])\) and \(D_T=(I+\eta M)^T\), where the superscript \(T\) on the last matrix denotes an integer power. Independence gives \(\E P_T=D_T\). The two matrix variances of \(G_j\) are \(mI\), so the cited estimate yields
+\[
+ \E\|P_T\|_F^2\le e^{m\eta^2T}\|D_T\|_F^2,\qquad
+ \E\|P_T-D_T\|_F^2\le(e^{m\eta^2T}-1)\|D_T\|_F^2.
+\]
+
+Take \(\ell=\log(4096\sqrt m)\), \(T=\lceil 2^{16}m\ell^2/\gamma^2\rceil\), \(\eta=\ell/(T\gamma)\), and \(b_\pm=1+\eta(1\pm\gamma)\). We have \(m\eta^2T\le2^{-16}\), \(b_+\le2\), and
+\[
+ T\log(b_+/b_-)\ge T(b_+-b_-)/b_+\ge \ell .
+\]
+Report the positive sign if \(\|P_Tx_0\|>16\sqrt m\, b_-^T\). On the negative class \(\|D_T\|_F\le\sqrt m\,b_-^T\), and Markov's inequality bounds the false-positive probability by \(e^{2^{-16}}/256\). On the positive class \(\|D_T\|_F\ge b_+^T\). With probability at least \(1-4(e^{2^{-16}}-1)\) we have \(\|P_T\|_F\ge b_+^T/2\). For any nonzero fixed \(P\) and \(g\sim N(0,I)\), the Gaussian Laplace transform gives
+\[
+ \Pr(\|Pg\|\le u\|P\|_F)
+ \le e^{1/2}\prod_j\left(1+\frac{s_j(P)^2}{u^2\|P\|_F^2}\right)^{-1/2}
+ \le \sqrt e\,u .
+\]
+Applying this with \(P=P_T\) on the good event gives false-negative probability at most \(4(e^{2^{-16}}-1)+32\sqrt e\,\sqrt m\,e^{-\ell}<1/8\). The total cost is \(mT\). The energy and inverse-moment estimates in \cref{sec:algorithm} remove one factor of \(\log m\).

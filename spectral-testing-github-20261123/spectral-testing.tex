@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=1.0in,top=.86in,bottom=.88in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{graphicx,booktabs,enumitem,microtype}
+\usepackage{xcolor}
+\definecolor{inkblue}{RGB}{29,68,106}
+\usepackage[colorlinks=true,allcolors=inkblue,bookmarksnumbered=true]{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
+\setlength{\parindent}{1.25em}
+\setlength{\parskip}{0.1em}
+\setlength{\emergencystretch}{1em}
+\allowdisplaybreaks[2]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\sym}{sym}
+\DeclareMathOperator{\dil}{dil}
+\DeclareMathOperator{\vecop}{vec}
+\DeclareMathOperator{\mat}{mat}
+\DeclareMathOperator{\acosh}{arcosh}
+\DeclareMathOperator{\kl}{kl}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\N}{\mathcal N}
+\newcommand{\Sym}{\mathbb S}
+\newcommand{\Aplus}{\mathcal A_+}
+\newcommand{\Aminus}{\mathcal A_-}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\Frob}{\mathrm F}
+\newcommand{\nad}{N_{\mathrm{ad}}}
+\newcommand{\nna}{N_{\mathrm{na}}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+\newcommand{\ip}[2]{\left\langle#1,#2\right\rangle}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\eps}{\varepsilon}
+\title{\bfseries Sharp Adaptivity Gaps for Noisy Spectral Testing}
+\author{SMC\\[-.1em]{\small Beihang University}\\[-.1em]{\small\href{mailto:changSM@buaa.edu.cn}{\texttt{changSM@buaa.edu.cn}}}}
+\date{\small November 23, 2026}
+\hypersetup{pdftitle={Sharp Adaptivity Gaps for Noisy Spectral Testing},pdfauthor={SMC},pdfsubject={Preprint on the minimax cost of spectral sign testing}}
+\begin{document}
+\maketitle
+\begin{abstract}
+We determine how many noisy scalar measurements suffice to decide the sign of the largest eigenvalue of an unknown symmetric matrix. The matrix and each linear query lie in the unit Frobenius ball. Each response carries independent standard Gaussian noise, and the largest eigenvalue has magnitude at least \(\gamma\). For an \(m\times m\) matrix, margin \(0<\gamma\le 1/(8\sqrt m)\), and error probability \(\delta\le1/8\), the adaptive minimax cost is \(\Theta(m^2[\log m+\log(1/\delta)]/\gamma^2)\). Fixing the query directions in advance raises the cost to \(\Theta(m^2[m+\log(1/\delta)]/\gamma^2)\). At constant error, feedback saves a factor of order \(m/\log m\), and any polynomial saving requires \(\Omega(\log m)\) batches. The two signs also have different certification costs. After an initial discovery cost of order \(m^2\log m/\gamma^2\), the additional expected cost of confidence is of order \(\log(1/\delta)/\gamma^2\) on positive inputs and \(m^2\log(1/\delta)/\gamma^2\) on negative inputs. A preconditioned noisy Chebyshev iteration attains the adaptive rate. For the converse we bound the distance between the two decision transcripts when a rank-one perturbation is hidden in a fixed Gaussian background.
+\end{abstract}
+\input{sections/introduction}
+\input{sections/baselines}
+\input{sections/algorithm}
+\input{sections/discovery}
+\input{sections/classwise}
+\input{sections/rounds}
+\input{references}
+\appendix
+\input{sections/round_appendix}
+\input{sections/power_comparison}
+\end{document}

@@ -1,0 +1,66 @@
+\section{Confidence and fixed designs}\label{sec:fixed}
+
+Two elementary experiments account for the \(t\) and \(m\) terms of the fixed-design rate. The first measures a directional contrast against a scalar null. The second measures an orthonormal basis of the symmetric matrices.
+
+\begin{proposition}[Cost of confidence]\label{prop:confidence}
+For every \(\delta\)-correct test, some negative input satisfies
+\(\E_A\tau\ge c m^2\log(1/\delta)/\gamma^2\) for a universal \(c>0\).
+\end{proposition}
+\begin{proof}
+Take \(A_0=-2\gamma I_m\). For each unit \(u\) put
+\[
+ A_u=A_0+\alpha(uu^\top-I_m/m),\qquad
+ \alpha=\frac{3\gamma}{1-1/m}.
+\]
+Then \(\lambda_{\max}(A_u)=\gamma\) and
+\(\|A_u\|_F^2=4m\gamma^2+9\gamma^2/(1-1/m)\le1\).
+For a fixed \(u\), the Gaussian chain rule for the stopped likelihood and data processing to the final sign give
+\[
+ \frac{\alpha^2}2\,\E_0\sum_{j=1}^{\tau}
+ \left(u^\top Q_j u-\tr(Q_j)/m\right)^2
+ \ \ge\ \kl(\delta,1-\delta).
+\]
+Here \(\kl\) is binary relative entropy. To obtain the stopped identity, pad the experiment after stopping with zero queries, apply the chain rule at a deterministic horizon, and pass to the increasing limit of the transcript sigma fields. We may assume the worst-case mean stopping time is finite. Under \(A_0\) the entire policy is independent of an auxiliary uniform unit vector \(u\). Its fourth moments satisfy
+\(\E[u_i u_j u_k u_l]=(\delta_{ij}\delta_{kl}+\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})/[m(m+2)]\)
+by rotational invariance and \(\|u\|=1\). Thus
+\begin{equation}\label{eq:sph}
+ \E_u (u^\top Qu-\tr Q/m)^2
+ =\frac{2}{m(m+2)}
+    \left(\|Q\|_F^2-\frac{(\tr Q)^2}{m}\right)
+ \le\frac{2}{m(m+2)} .
+\end{equation}
+For example, $Q=I/\sqrt m$ spends its entire energy on trace and has zero contrast in \eqref{eq:sph}. More generally $(\tr Q)^2\le \operatorname{rank}(Q)\|Q\|_F^2$ by Cauchy--Schwarz on the nonzero eigenvalues. The Lean supplement contains a proof of this trace bound for real square matrices.
+
+Averaging the preceding likelihood bound, using \(\alpha\le6\gamma\) and \(\kl(\delta,1-\delta)=(1-2\delta)\log((1-\delta)/\delta)\), proves the claim.
+\end{proof}
+
+\begin{lemma}[Reconstruction in one batch]\label{lem:reconstruct}
+There is a fixed design of cost \(O(m^2[m+\log(1/\delta)]/\gamma^2)\) returning \(\widehat A\) with \(\|\widehat A-A\|_{\op}\le\gamma/2\) with probability at least \(1-\delta\).
+\end{lemma}
+\begin{proof}
+Query each of the \(D=m(m+1)/2\) matrices of a Frobenius-orthonormal basis \(k\) times. The error \(E\) obtained by averaging the basis coordinates has independent \(\N(0,1/k)\) coordinates in this basis. Every unit \(u\) therefore gives \(u^\top E u\sim\N(0,1/k)\). A \(1/4\)-net of the sphere has size at most \(9^m\) and \(\|E\|_{\op}\le2\max_{u\ \mathrm{in\ net}}|u^\top E u|\). The failure probability is at most \(2\cdot9^m\exp(-k\gamma^2/32)\). Take \(k=\lceil32[m\log9+\log(2/\delta)]/\gamma^2\rceil\). On the success event Weyl's inequality gives the correct sign.
+\end{proof}
+
+\paragraph{What a fixed design can see.}
+We give the mixture argument since it identifies the statistic of a noisy design that controls distinguishability. Write \(d=\lfloor m/2\rfloor\), and set
+\[
+ \sigma=\gamma/(16\sqrt d),\qquad a=128/\sqrt d,\qquad
+ A_i=-2\gamma I_m+\sigma\dil(G+i aUV^\top),\quad i\in\{0,1\}.
+\]
+The entries of \(G\in\R^{d\times d}\) and of \(U,V\in\R^d\) are independent standard Gaussians. The symmetric dilation has off-diagonal blocks \(X,X^\top\) and vanishing diagonal blocks, padded by a zero coordinate for odd \(m\). \Cref{sec:discovery} shows that each prior can be restricted to its promised class at a cost of \(O(e^{-cd})\) in total variation.
+
+Fix the seed and the first \(n\) queries of a nonadaptive design. After removal of the known intercept, the null covariance is \(\Sigma=I+\sigma^2LL^\top\), where row \(j\) of \(L\) is the vectorization of \(2(Q_j)_{12}\). Each row has squared norm at most two. Whitening gives a standard Gaussian under the null and a Gaussian with conditional mean \(aFz\) and identity covariance under the alternative, where \(z=\vecop(UV^\top)\), \(F=\sigma\Sigma^{-1/2}L\). Put \(K=F^\top F\). If \(s_j\) are the eigenvalues of \(\sigma^2L^\top L\), then
+\begin{equation}\label{eq:softGram}
+ \kappa:=\tr K^2
+   =\sum_j\left(\frac{s_j}{1+s_j}\right)^2
+   \le\sum_j s_j \le 2\sigma^2n .
+\end{equation}
+
+To bound the mixture distance, suppose \(a^4\kappa\le10^{-4}\). The event \(E=\{\|Kz\|^2\le100\kappa\}\) has probability \(p\ge0.99\), since \(\E zz^\top=I\). Denote by \(P_{1,E}\) the mixture conditioned on \(E\) and by \(P_0\) the whitened null. For an independent copy \(z'\), the Gaussian likelihood identity gives
+\[
+ 1+\chi^2(P_{1,E}\Vert P_0)
+ =p^{-2}\E[\ind_E(z)\ind_E(z')\exp(a^2 z^\top K z')].
+\]
+For \(z\in E\) the matrix \(M=a^2\mat(Kz)\) satisfies \(\|M\|_F^2\le0.01\), where \(\mat\) inverts vectorization. Integrating over both Gaussian factors of \(z'\) gives \(\E_{z'}\exp(a^2z^\top Kz')=\det(I-M^\top M)^{-1/2}\le(1-\|M\|_F^2)^{-1/2}\). Discarding \(\ind_E(z')\) yields \(1+\chi^2\le0.99^{-3/2}\). Restoring the excluded mass, the unconditioned transcript distance is at most \(0.01+\tfrac12\sqrt{0.99^{-3/2}-1}<0.1\).
+
+By \eqref{eq:softGram} this applies whenever \(n\le c_0d^3/\gamma^2\) for a universal \(c_0>0\). The same priors work for every seed. Averaging over the seed and restricting to the promised classes gives distance less than \(1/4\) for all sufficiently large \(d\). A test of worst-case expected cost \(B\) can be truncated at \(\lceil8B\rceil\) with additional error at most \(1/8\). Its two output laws would have distance at least \(1/2\). This proves \(B=\Omega(m^3/\gamma^2)\), with the bounded dimensions covered by \cref{prop:confidence}. Taking the maximum with the confidence bound and using \cref{lem:reconstruct} proves \eqref{eq:na}.

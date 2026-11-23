@@ -1,0 +1,33 @@
+\section{The cost on each side of the test}\label{sec:classwise}
+
+A direction \(v\) with a positive Rayleigh quotient can be checked by repeated measurements of \(vv^\top\). The issue is how to find such a direction when the positive eigenspace could be one-dimensional. The block iteration in Section~\ref{sec:algorithm} provides one at the same cost as fixed-error testing.
+
+\paragraph{Extracting a direction.}
+Use the coarse estimate and recursion of Section~\ref{sec:algorithm} with \(b=1\), \(T=\log 128\), \(p=2\), \(s=4\), \(d=4m\), and increase \(k\) to \(\lceil 2^{18}d/(\tau^2\eta^{3/2})\rceil\). Keep the span \(K_j\) of the columns of \(X_0,\ldots,X_j\). We claim that for every positive input, with probability at least \(15/16\) the following procedure returns a unit \(v\) with \(v^\top A v\ge\gamma/48\). The proof concerns a fixed first-batch realization in the good event \(\mathcal G\).
+
+Let \(D_j=D(X_j,X_{j-1})\) be the energy from Section~\ref{sec:algorithm} and \(E_j\) the event that every unit \(x\in K_j\) has \(x^\top C_A x\le\eta/8\). These events are decreasing. On \(E_j\), the compression of \(B\) to \(K_j\) has spectrum in \([-\rho,1-\eta/4]\), since \(\rho+a\eta/8\le1-\eta/4\). Thus \(D_j\ge(\eta/4) S_j^2\), where \(S_j^2=\|X_j\|_F^2+\|X_{j-1}\|_F^2\).
+
+On \(E_{j-1}\), write \(x=X_{j-1}\), \(y=X_{j-2}\), \(e=D_{j-1}\), and \(w=Bx-y\). We have \(\|w\|_F^2\le10S_{j-1}^2\le40e/\eta\) because \(\|B\|_{\rm op}\le3\), and \(\nu_j\le64e/(\tau^2 k\eta)\). Conservation of the noiseless energy gives \(D_j=e+2\langle \xi_j,w\rangle+\|\xi_j\|_F^2\). For \(e>0\), use \((-e-z)_+\le z^2/(4e)\) to bound the energy discarded when the span leaves \(E_j\). Conditional on the past,
+\[
+ \mathbb E[(D_j)_+]\le e+d\nu_j+\nu_j\|w\|_F^2/e
+ \le (1+\sqrt\eta/64)e .
+\]
+The final inequality uses \(d\eta\ge1\) and the choice of \(k\). For \(e=0\) the two previous iterates vanish. Nesting and iteration yield \(\mathbb E[D_r\mathbf 1_{E_r}]\le d e^{r\sqrt\eta/64}\), starting from \(\mathbb E D_0=d\). Use the threshold \(H\) of Section~\ref{sec:algorithm}. Markov's inequality on \(E_r\) and the positive-class inverse-moment estimate, respectively, give
+\[
+ \Pr(E_r,\ S_r>H)\le2e^{-15r\sqrt\eta/64},\qquad
+ \Pr(S_r\le H)\le e^{-2L}.
+\]
+The latter calculation uses \(p=2\) in the inverse-moment bound. Increasing \(k\) preserves the conditional isotropic noise required there. Since \(r\sqrt\eta\ge8L\), these errors sum to less than \(1/128\). On \(E_r^c\), some unit \(x\in K_r\) satisfies \(x^\top C_A x>\eta/8\). The unit vector along \(Px\) has Rayleigh quotient exceeding \(\tau\eta/8\ge\gamma/24\).
+
+The algorithm computes an orthonormal basis \(V\) of \(P K_r\). In the zero-dimensional case return a fixed unit vector. Otherwise, with \(h=\dim(P K_r)\), measure \(VFV^\top\) for each member \(F\) of a Frobenius-orthonormal basis of symmetric \(h\times h\) matrices. These queries have unit norm. Using fresh responses and \(O(h/\gamma^2)\) repetitions per member, the net estimate of Section~\ref{sec:algorithm} gives an estimate of \(V^\top A V\) within \(\gamma/96\) in operator norm with conditional probability at least \(127/128\). Lift a top unit eigenvector of the estimate by \(V\). Its Rayleigh quotient loses at most \(2\gamma/96\). The coarse estimate, the span test in the analysis, and the compression contribute total failure at most \(3/128\). The recursion costs \(O(m^2 L/\gamma^2)\) even with the increased \(k\). Since \(h\le 4(r+1)=O(m^{1/4}L)\), the compression costs \(O(h^3/\gamma^2)=O(m^2 L/\gamma^2)\), using \(L^2=O(m^{5/4})\). These are deterministic cost bounds on both classes.
+
+\paragraph{Validation and stopping.}
+On attempt \(j\ge1\), run a fresh copy of the direction procedure. Validate its output \(v\) by averaging \(n_j=\lceil c\gamma^{-2}\log(1/\epsilon_j)\rceil\) new responses to \(vv^\top\), with \(\epsilon_j=\delta/[16(j+1)^2]\). Accept the positive class if the average exceeds zero, and otherwise repeat. For an absolute \(c\) large enough, a Gaussian tail bound gives conditional false acceptance probability at most \(\epsilon_j\) on every negative input. On a positive input each attempt succeeds with conditional probability at least \((15/16)(1-\epsilon_j)>7/8\). Thus the expected cost on a positive input is bounded by
+\[
+ \sum_{j\ge1}8^{1-j}\big[O(m^2 L/\gamma^2)+n_j\big]
+     =O((m^2 L+t)/\gamma^2).
+\]
+Interleave this search, one observation at a time, with the deterministic-budget test of Proposition~\ref{prop:adaptive-algorithm} at risk \(\delta/2\). Output the first answer received. Each test reads its own independent measurements. Overall error on the negative class is at most \(\delta/2+\sum_j\epsilon_j\), and on the positive class at most \(\delta/2\). The cost is at most twice the deterministic budget, and on positive inputs it is also at most twice the search cost plus one.
+
+\paragraph{Matching lower bounds.}
+For either class let \(B_*\) be the expected cost of a given test in the worst case over that class. Truncate at \(\lceil32 B_*\rceil\) and return the opposite class on timeout. The sum of the two worst-case errors is at most \(2\delta+1/32\), by Markov's inequality on the class being timed. The legal-prior transcript bound of Section~\ref{sec:discovery} then forces \(B_*=\Omega(m^2\log(m)/\gamma^2)\) for all sufficiently large \(m\). For the positive confidence term, compare \(A_-=-\gamma I\) with \(A_+=-\gamma I+2\gamma uu^\top\) for a fixed unit \(u\). Both have Frobenius norm \(\gamma\sqrt m\). Each query contributes at most \(2\gamma^2\) to relative entropy in either direction. The stopped Gaussian chain rule and data processing for the answer give \(2\gamma^2\mathbb E_{A_+}\tau_{\rm stop}\ge\kl(1-\delta,\delta)\ge t/2\). Reversing the two points gives the same fixed-error lower bound on the other class, which covers the remaining bounded dimensions after adjusting the absolute constant. Proposition~\ref{prop:confidence} supplies the \(m^2t/\gamma^2\) negative-class bound. Taking the larger of the discovery and confidence bounds proves Theorem~\ref{thm:classwise}.
